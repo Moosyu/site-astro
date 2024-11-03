@@ -1,0 +1,139 @@
+---
+interface Props {
+	title: string;
+}
+
+import { ViewTransitions } from 'astro:transitions';
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content="Astro description" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/emoticon_002.png" />
+		<meta name="generator" content="super famous and sexy internet person" />
+		<title>{title}</title>
+		<ViewTransitions />
+	</head>
+	<body style="min-height: 100vh; display:flex; flex-direction: column;" transition:animate="none">
+		<header>
+			<h1 style="font-size: 40px;">{title}</h1>
+		</header>
+			<nav>
+				<span>Pages:</span>
+				<a href="/"><span>Home</span></a>
+				<a href="about"><span>About</span></a>
+				<a href="links"><span>Links</span></a>
+				<br>
+				<span class="seperator">|</span>
+				<span>Contact:</span>
+				<a id="linkText" href="#" transition:persist><span>Discord</span></a>
+				<a href="mailto:moosyu@tuta.io"><span>Email</span></a>
+				<br>
+				<span class="seperator">|</span>
+				<span>Misc:</span>
+				<div id="listening" transition:persist></div>	
+			</nav>	
+		<slot />
+	</body>
+</html>
+
+<script>
+	document.getElementById('linkText').addEventListener("click", () => {
+		navigator.clipboard.writeText("memecompanies");
+		alert("Copied to clipboard")		
+	});
+
+	const USERNAME = "moosyu";
+	const BASE_URL = `https://lastfm-last-played.biancarosa.com.br/${USERNAME}/latest-song`;
+
+	const getTrack = async () => {
+		const request = await fetch(BASE_URL);
+		const json = await request.json();
+		let currentState = ""
+
+		let isPlaying = json.track['@attr']?.nowplaying || false;
+
+		if(!isPlaying) {
+			currentState = "Last heard:"
+		} else {
+			currentState = "Listening to:"
+		}
+
+		document.getElementById("listening").innerHTML = `
+		<a href="${json.track.url}">
+			<span>${currentState} ${json.track.name}</span>
+		</a>
+		`
+	};
+
+	getTrack();
+	setInterval(() => { getTrack(); }, 10000);
+</script>
+
+<style is:global>
+	* {
+		margin: 0;
+	}
+	html {
+		font-family: monospace;
+		background: #0D1017;
+	}
+	a, p, h1, h2 {
+		color: white;
+	}
+	a, p {
+		font-size: 16px;
+	}
+	nav {
+		flex-direction: column;
+		align-items: flex-start;
+		text-align: center;
+		background-color: rgba(71, 82, 102, 0.25);
+		color: white;
+	}
+	nav span {
+		margin: 0 5px 0 5px;
+		font-size: 20px;
+	}
+	header {
+		color: white;
+		height: 70px;
+		display: flex;
+		align-items: flex-end;
+		padding-bottom: 10px;
+		background-color: rgba(71, 82, 102, 0.25);
+		padding: 5px;
+	}
+	header h1 {
+		margin-left: 10px;
+	}
+	main {
+		padding: 20px;
+	}
+	.seperator {
+		display: none;
+	}
+	@media (min-width: 900px) {
+		nav {
+			width: 100%;
+			color: white;
+			box-sizing: border-box;
+			padding: 2px 10px;
+			overflow: hidden;
+			display: flex;
+			flex-direction: row;
+		}
+		a:hover {
+			font-style: italic;
+			background-color: #D2A6FF;
+			color: black;
+		}
+		.seperator {
+		display: block;
+		}
+	}
+</style>
