@@ -31,5 +31,14 @@ const currentTime = new Date().toLocaleString("en-US", {
 		<p>The offical homepage of Google.</p>
 		<p>Quote of the build: {randomText}</p>
         <p>This site was last build on: {currentTime} (NZDT)</p>
+        <p transition:persist id="views"></p>
 	</main>
 </Layout>
+
+<script>
+(() => {
+  fetch(`https://poyoweb.me/api/websitedata?domain=google.poyoweb.me`).then(request => request.json()).then(json => {
+      document.getElementById("views").textContent = `View count: ${json.views}`;
+    }).catch(error => console.error(error));
+})();
+</script>
